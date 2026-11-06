@@ -273,7 +273,7 @@
                         <p class="bg-amber-50/50 p-3 rounded-xl border border-amber-100/60">
                             <strong>捷運資訊：</strong><span class="no-wrap">捷運紅線民權西路站1號出口</span>，步行約 3-5 分鐘即可抵達。
                         </p>
-                        <a href="https://maps.google.com/?q=台北市大同區民權西路106號B1F" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-white bg-[#8da399] px-4 py-2 rounded-lg hover:bg-[#7b9187] transition-colors">
+                        <a href="https://maps.app.goo.gl/iq6Ze6hKJzaiUabB9" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-white bg-[#8da399] px-4 py-2 rounded-lg hover:bg-[#7b9187] transition-colors">
                             <i class="fa-solid fa-map-location-dot"></i> 開啟 Google Map 導航
                         </a>
                     </div>
@@ -335,7 +335,7 @@
                             </div>
                         </div>
 
-                        <a href="https://maps.google.com/?q=新北市三重區尚德里龍門路6號4F" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-white bg-[#8da399] px-4 py-2 rounded-lg hover:bg-[#7b9187] transition-colors">
+                        <a href="https://maps.app.goo.gl/dTAp6AvbZVtPZAPt5" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-white bg-[#8da399] px-4 py-2 rounded-lg hover:bg-[#7b9187] transition-colors">
                             <i class="fa-solid fa-map-location-dot"></i> 開啟 Google Map 導航
                         </a>
                     </div>
@@ -458,18 +458,6 @@
                     </select>
                 </div>
 
-                <!-- 智能動態隱藏/顯示區塊：素食人數 -->
-                <div id="vege_wrapper">
-                    <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                        素食(肉很美味，確定不吃?) <span class="font-cormorant text-morandi-warm">VEGETARIAN</span>
-                    </label>
-                    <select name="entry.1156347604" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#d4a373] focus:ring-2 focus:ring-[#d4a373]/20 outline-none transition-all bg-white text-gray-700 text-sm">
-                        <option value="0" selected>0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                    </select>
-                </div>
-
                 <!-- 祝福話語 -->
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
@@ -584,14 +572,12 @@
             
             const adultWrapper = document.getElementById('adult_count_wrapper');
             const childWrapper = document.getElementById('child_count_wrapper');
-            const vegeWrapper = document.getElementById('vege_wrapper');
             const chairWrapper = document.getElementById('chair_wrapper');
 
             // 邏輯 1：當選擇「無法出席獻上祝福」時，隱藏大人、兒童人數，直接跳到給新人的祝福
             if (attendance === '無法出席獻上祝福') {
                 adultWrapper.classList.add('hidden');
                 childWrapper.classList.add('hidden');
-                vegeWrapper.classList.add('hidden');
                 chairWrapper.classList.add('hidden');
                 return;
             } else {
@@ -605,13 +591,6 @@
             } else {
                 chairWrapper.classList.add('hidden');
             }
-
-            // 邏輯 3：當選擇「證婚儀式(重要時刻怎能不在)」時隱藏素食選項；選擇「午宴」或「證婚+午宴都在💕」時顯示素食選項
-            if (attendance === '證婚儀式(重要時刻怎能不在)') {
-                vegeWrapper.classList.add('hidden');
-            } else {
-                vegeWrapper.classList.remove('hidden');
-            }
         }
 
         // 3. 摺疊面板 Accordion 邏輯
@@ -619,47 +598,57 @@
             const content = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
             
+            if (!content) return;
+            
             if (content.classList.contains('open')) {
                 content.classList.remove('open');
-                icon.style.transform = 'rotate(0deg)';
+                if (icon) icon.style.transform = 'rotate(0deg)';
             } else {
                 content.classList.add('open');
-                icon.style.transform = 'rotate(180deg)';
+                if (icon) icon.style.transform = 'rotate(180deg)';
             }
         }
 
-        function closeModal() {
-            document.getElementById('success_modal').classList.add('hidden');
-        }
-
-        // 4. 音樂面板展開/關閉與 YouTube API 自動暫停控制
+        // 4. 音樂面板開關與暫停邏輯
         function toggleMusicPanel() {
             const panel = document.getElementById('music-player-panel');
             const iframe = document.getElementById('yt-music-player');
-
+            
+            if (!panel) return;
+            
             if (panel.classList.contains('hidden')) {
-                // 展開面板
                 panel.classList.remove('hidden');
                 setTimeout(() => {
                     panel.classList.remove('scale-95');
                     panel.classList.add('scale-100');
                 }, 10);
             } else {
-                // 關閉面板前暫停影片播放 (符合 YouTube IFrame APIpostMessage 規範)
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                }
                 panel.classList.remove('scale-100');
                 panel.classList.add('scale-95');
                 setTimeout(() => {
                     panel.classList.add('hidden');
-                }, 200);
+                }, 300);
+
+                // 關閉面板時暫停音樂
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                }
             }
         }
 
-        // 5. 動態飄落花瓣動畫 Canvas
+        // 5. 關閉彈窗
+        function closeModal() {
+            const modal = document.getElementById('success_modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // 6. 動態飄落花瓣動畫 Canvas
         (function initPetalCanvas() {
             const canvas = document.getElementById('petal-canvas');
+            if (!canvas) return;
+            
             const ctx = canvas.getContext('2d');
 
             function resizeCanvas() {
